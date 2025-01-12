@@ -50,12 +50,12 @@ export default function TodoApp() {
   return (
     <div className="container">
       <h1>Todo App</h1>
-      <form onSubmit={addTodo}>
+      <form className="grid" onSubmit={addTodo}>
         <input
           type="text"
           value={newTodo}
           onChange={(e) => setNewTodo(e.target.value)}
-          placeholder="What needs to be done?"
+          placeholder="Add a todo..."
         />
         <button type="submit">Add Todo</button>
       </form>
@@ -63,26 +63,41 @@ export default function TodoApp() {
         {todos.map((todo) => (
           <li
             key={todo.id}
-            style={{ textDecoration: todo.completed ? "line-through" : "none" }}
+            className="todo-item grid"
+            style={{
+              margin: "10px 0",
+              textDecoration: todo.completed ? "line-through" : "none",
+            }}
           >
             {editingId === todo.id ? (
-              <input
-                type="text"
-                value={todo.text}
-                onChange={(e) => updateTodo(todo.id, e.target.value)}
-                onBlur={() => setEditingId(null)}
-                autoFocus
-              />
+              <div className="grid">
+                <input
+                  type="text"
+                  value={todo.text}
+                  onChange={(e) => updateTodo(todo.id, e.target.value)}
+                  onBlur={() => setEditingId(null)}
+                  autoFocus
+                />
+              </div>
             ) : (
-              <label
-                onClick={() => toggleTodo(todo.id)}
-                style={{ cursor: "pointer" }}
-              >
-                {todo.text}
-              </label>
+              <div className="grid">
+                <label className="todo-text">{todo.text}</label>
+                <div className="grid">
+                  <button onClick={() => toggleTodo(todo.id)}>
+                    {todo.completed ? "Undo" : "Complete"}
+                  </button>
+                  <button
+                    className="secondary"
+                    onClick={() => setEditingId(todo.id)}
+                  >
+                    Edit
+                  </button>
+                  <button className="error" onClick={() => deleteTodo(todo.id)}>
+                    Delete
+                  </button>
+                </div>
+              </div>
             )}
-            <button onClick={() => setEditingId(todo.id)}>Edit</button>
-            <button onClick={() => deleteTodo(todo.id)}>Delete</button>
           </li>
         ))}
       </ul>
