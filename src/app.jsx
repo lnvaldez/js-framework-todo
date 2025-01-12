@@ -1,4 +1,4 @@
-/** jsx @createElement */
+/** @jsx createElement */
 import { useState, createElement, store } from "./Framework.js";
 
 export default function TodoApp() {
@@ -31,6 +31,13 @@ export default function TodoApp() {
     store.setState({ todos: newTodos });
   };
 
+  const toggleTodo = (id) => {
+    const newTodos = store.state.todos.map((todo) =>
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo
+    );
+    store.setState({ todos: newTodos });
+  };
+
   return (
     <div className="container">
       <h1>Todo App</h1>
@@ -45,8 +52,16 @@ export default function TodoApp() {
       </form>
       <ul>
         {todos.map((todo) => (
-          <li key={todo.id}>
-            {todo.text}
+          <li
+            key={todo.id}
+            style={{ textDecoration: todo.completed ? "line-through" : "none" }}
+          >
+            <label
+              onClick={() => toggleTodo(todo.id)}
+              style={{ cursor: "pointer" }}
+            >
+              {todo.text}
+            </label>
             <button onClick={() => deleteTodo(todo.id)}>Delete</button>
           </li>
         ))}
