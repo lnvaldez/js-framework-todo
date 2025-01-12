@@ -1,8 +1,13 @@
 /** jsx @createElement */
-import { useState, createElement } from "./Framework.js";
+import { useState, createElement, store } from "./Framework.js";
 
 export default function TodoApp() {
   const [newTodo, setNewTodo] = useState("");
+  const [todos, setTodos] = useState(store.state.todos || []);
+
+  store.subscribe(() => {
+    setTodos(store.state.todos || []);
+  });
 
   const addTodo = (e) => {
     e.preventDefault();
@@ -33,7 +38,11 @@ export default function TodoApp() {
         />
         <button type="submit">Add Todo</button>
       </form>
-      <ul></ul>
+      <ul>
+        {todos.map((todo) => (
+          <li key={todo.id}>{todo.text}</li>
+        ))}
+      </ul>
     </div>
   );
 }
