@@ -26,6 +26,11 @@ export default function TodoApp() {
     setNewTodo("");
   };
 
+  const deleteTodo = (id) => {
+    const newTodos = store.state.todos.filter((todo) => todo.id !== id);
+    store.setState({ todos: newTodos });
+  };
+
   return (
     <div className="container">
       <h1>Todo App</h1>
@@ -40,7 +45,10 @@ export default function TodoApp() {
       </form>
       <ul>
         {todos.map((todo) => (
-          <li key={todo.id}>{todo.text}</li>
+          <li key={todo.id}>
+            {todo.text}
+            <button onClick={() => deleteTodo(todo.id)}>Delete</button>
+          </li>
         ))}
       </ul>
     </div>
