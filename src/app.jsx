@@ -1,22 +1,11 @@
-/** @jsx createElement */
-import { createElement, render, useState } from "./Framework";
+/** jsx @createElement */
+import { createElement } from "./Framework.js";
 
-function Counter() {
-  const [count, setCount] = useState(0);
-
+export default function TodoApp() {
   return (
     <div>
-      <h1>Count: {count}</h1>
-      <button
-        onClick={() => {
-          console.log("Current count:", count);
-          setCount(count + 1);
-        }}
-      >
-        Increment
-      </button>
+      <h1>Todo App</h1>
+      <ul></ul>
     </div>
   );
 }
-
-render(<Counter />, document.getElementById("root"));
