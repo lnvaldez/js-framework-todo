@@ -2,59 +2,123 @@ let globalId = 0;
 let globalParent;
 const componentState = new Map();
 
+export function useState(initialState) {
+  const id = globalId;
+  const parent = globalParent;
+  globalId++;
+
+  const state = componentState.get(parent) || { cache: [] };
+  componentState.set(parent, state);
+
+  if (state.cache[id] == null) {
+    state.cache[id] = {
+      value: typeof initialState === "function" ? initialState() : initialState,
+    };
+  }
+
+  const setState = (stateUpdate) => {
+    const parentState = componentState.get(parent);
+    if (!parentState) return;
+
+    if (typeof stateUpdate === "function") {
+      state.cache[id].value = stateUpdate(state.cache[id].value);
+    } else {
+      state.cache[id].value = stateUpdate;
+    }
+
+    queueMicrotask(() => {
+      render(parentState.component, parentState.props, parent);
+    });
+  };
+
+  return [state.cache[id].value, setState];
+}
+
+export function render(element, props, parent) {
+  if (!element) return;
+
+  const state = componentState.get(parent) || { cache: [] };
+  componentState.set(parent, {
+    ...state,
+    component: element,
+    props: props,
+  });
+
+  globalParent = parent;
+
+  const currentGlobalId = globalId;
+  globalId = 0;
+
+  let output;
+  if (typeof element.type === "function") {
+    output = element.type(element.props);
+  } else {
+    output = element;
+  }
+
+  globalId = currentGlobalId;
+
+  if (output) {
+    parent.innerHTML = "";
+    renderVirtualDOM(output, parent);
+  }
+}
+
 export function createElement(type, props, ...children) {
+  const flatChildren = children.flat().filter((child) => child != null);
   return {
     type,
     props: {
       ...props,
-      children: children.length === 1 ? children[0] : children,
+      children: flatChildren.length === 1 ? flatChildren[0] : flatChildren,
     },
   };
 }
 
-export function render(element, container) {
-  if (typeof element === "string" || typeof element === "number") {
-    container.appendChild(document.createTextNode(element));
+export function renderVirtualDOM(vnode, container) {
+  if (!vnode) return;
+
+  if (typeof vnode === "string" || typeof vnode === "number") {
+    container.appendChild(document.createTextNode(vnode));
     return;
   }
 
-  if (typeof element.type === "function") {
-    const component = element.type(element.props);
-    render(component, container);
-    return;
+  const dom = document.createElement(vnode.type);
+
+  if (vnode.props) {
+    Object.entries(vnode.props).forEach(([name, value]) => {
+      if (name.startsWith("on") && typeof value === "function") {
+        const eventName = name.toLowerCase().substring(2);
+        dom.addEventListener(eventName, value);
+      } else {
+        dom.setAttribute(name, value);
+      }
+    });
   }
 
-  const dom = document.createElement(element.type);
-
-  Object.entries(element.props || {}).forEach(([name, value]) => {
-    if (name.startsWith("on")) {
-      const eventName = name.toLowerCase().substring(2);
-      dom.addEventListener(eventName, value);
-    } else if (name !== "children") {
-      dom[name] = value;
-    }
-  });
-
-  if (element.props.children) {
-    if (Array.isArray(element.props.children)) {
-      element.props.children.forEach((child) => render(child, dom));
+  if (vnode.props && vnode.props.children) {
+    if (Array.isArray(vnode.props.children)) {
+      vnode.props.children.forEach((child) => renderVirtualDOM(child, dom));
     } else {
-      render(element.props.children, dom);
+      renderVirtualDOM(vnode.props.children, dom);
     }
   }
 
   container.appendChild(dom);
 }
 
-export function useState(initialState) {
-  const id = globalId;
-  const parent = globalParent;
-  globalId++;
+const store = {
+  state: {
+    todos: [],
+  },
+  listeners: [],
+  setState(newState) {
+    this.state = { ...this.state, ...newState };
+    this.listeners.forEach((listener) => listener());
+  },
+  subscribe(listener) {
+    this.listeners.push(listener);
+  },
+};
 
-  return [
-    initialState,
-    (newValue) => {
-      console.log("Trying to update state to:", newValue);
-    },
-  ];
-}
+export { store };
