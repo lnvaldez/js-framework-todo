@@ -1,11 +1,22 @@
 /** @jsx createElement */
-import { createElement, render } from "./Framework";
+import { createElement, render, useState } from "./Framework";
 
-const element = (
-  <div>
-    <h1>Hello JS</h1>
-    <p>First test</p>
-  </div>
-);
+function Counter() {
+  const [count, setCount] = useState(0);
 
-render(element, document.getElementById("root"));
+  return (
+    <div>
+      <h1>Count: {count}</h1>
+      <button
+        onClick={() => {
+          console.log("Current count:", count);
+          setCount(count + 1);
+        }}
+      >
+        Increment
+      </button>
+    </div>
+  );
+}
+
+render(<Counter />, document.getElementById("root"));
