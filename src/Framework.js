@@ -2,17 +2,6 @@ let globalId = 0;
 let globalParent;
 const componentState = new Map();
 
-export function useState(initialState) {
-  const [state, setState] = [
-    initialState,
-    (newValue) => {
-      console.log("State updated to:", newValue);
-    },
-  ];
-
-  return [state, setState];
-}
-
 export function createElement(type, props, ...children) {
   return {
     type,
@@ -55,4 +44,17 @@ export function render(element, container) {
   }
 
   container.appendChild(dom);
+}
+
+export function useState(initialState) {
+  const id = globalId;
+  const parent = globalParent;
+  globalId++;
+
+  return [
+    initialState,
+    (newValue) => {
+      console.log("Trying to update state to:", newValue);
+    },
+  ];
 }
