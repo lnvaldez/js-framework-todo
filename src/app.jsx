@@ -3,6 +3,7 @@ import { useState, createElement, store } from "./Framework.js";
 
 export default function TodoApp() {
   const [newTodo, setNewTodo] = useState("");
+  const [editingId, setEditingId] = useState(null);
   const [todos, setTodos] = useState(store.state.todos || []);
 
   store.subscribe(() => {
@@ -38,6 +39,14 @@ export default function TodoApp() {
     store.setState({ todos: newTodos });
   };
 
+  const updateTodo = (id, newText) => {
+    const newTodos = store.state.todos.map((todo) =>
+      todo.id === id ? { ...todo, text: newText } : todo
+    );
+    store.setState({ todos: newTodos });
+    setEditingId(null);
+  };
+
   return (
     <div className="container">
       <h1>Todo App</h1>
@@ -46,7 +55,7 @@ export default function TodoApp() {
           type="text"
           value={newTodo}
           onChange={(e) => setNewTodo(e.target.value)}
-          placeholder="Add a new todo"
+          placeholder="What needs to be done?"
         />
         <button type="submit">Add Todo</button>
       </form>
@@ -56,12 +65,23 @@ export default function TodoApp() {
             key={todo.id}
             style={{ textDecoration: todo.completed ? "line-through" : "none" }}
           >
-            <label
-              onClick={() => toggleTodo(todo.id)}
-              style={{ cursor: "pointer" }}
-            >
-              {todo.text}
-            </label>
+            {editingId === todo.id ? (
+              <input
+                type="text"
+                value={todo.text}
+                onChange={(e) => updateTodo(todo.id, e.target.value)}
+                onBlur={() => setEditingId(null)}
+                autoFocus
+              />
+            ) : (
+              <label
+                onClick={() => toggleTodo(todo.id)}
+                style={{ cursor: "pointer" }}
+              >
+                {todo.text}
+              </label>
+            )}
+            <button onClick={() => setEditingId(todo.id)}>Edit</button>
             <button onClick={() => deleteTodo(todo.id)}>Delete</button>
           </li>
         ))}
