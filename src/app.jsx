@@ -65,39 +65,35 @@ export default function TodoApp() {
             key={todo.id}
             className="todo-item grid"
             style={{
-              margin: "10px 0",
+              margin: "0px 0",
               textDecoration: todo.completed ? "line-through" : "none",
+              cursor: "pointer",
             }}
+            onClick={() => toggleTodo(todo.id)}
           >
-            {editingId === todo.id ? (
+            <div className="grid">
+              <label className="todo-text">{todo.text}</label>
               <div className="grid">
-                <input
-                  type="text"
-                  value={todo.text}
-                  onChange={(e) => updateTodo(todo.id, e.target.value)}
-                  onBlur={() => setEditingId(null)}
-                  autoFocus
-                />
+                <button
+                  className="secondary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEditingId(todo.id);
+                  }}
+                >
+                  Edit
+                </button>
+                <button
+                  className="error"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteTodo(todo.id);
+                  }}
+                >
+                  Delete
+                </button>
               </div>
-            ) : (
-              <div className="grid">
-                <label className="todo-text">{todo.text}</label>
-                <div className="grid">
-                  <button onClick={() => toggleTodo(todo.id)}>
-                    {todo.completed ? "Undo" : "Complete"}
-                  </button>
-                  <button
-                    className="secondary"
-                    onClick={() => setEditingId(todo.id)}
-                  >
-                    Edit
-                  </button>
-                  <button className="error" onClick={() => deleteTodo(todo.id)}>
-                    Delete
-                  </button>
-                </div>
-              </div>
-            )}
+            </div>
           </li>
         ))}
       </ul>
