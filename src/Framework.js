@@ -80,3 +80,65 @@ function createDom(vNode) {
 
   return dom;
 }
+
+function updateDom(dom, oldVNode, newVNode) {
+  if (oldVNode === newVNode) return;
+
+  if (typeof newVNode === "string" || typeof newVNode === "number") {
+    if (oldVNode !== newVNode) {
+      dom.textContent = newVNode;
+    }
+    return;
+  }
+
+  if (typeof newVNode.type === "function") {
+    const component = new newVNode.type(newVNode.props);
+    const newRenderedVNode = component.render();
+    updateDom(dom, oldVNode, newRenderedVNode);
+    component.componentDidUpdate();
+    return;
+  }
+
+  const newProps = newVNode.props || {};
+  const oldProps = oldVNode.props || {};
+
+  Object.entries(newProps).forEach(([key, value]) => {
+    if (key === "children") return;
+    if (key.startsWith("on") && typeof value === "function") {
+      const eventName = key.toLowerCase().substring(2);
+      dom.addEventListener(eventName, value);
+    } else if (key === "className") {
+      dom.setAttribute("class", value);
+    } else if (key === "style") {
+      if (typeof value === "string") {
+        dom.setAttribute("style", value);
+      } else if (typeof value === "object") {
+        Object.entries(value).forEach(([cssKey, cssValue]) => {
+          dom.style[cssKey] = cssValue;
+        });
+      }
+    } else {
+      dom.setAttribute(key, value);
+    }
+  });
+
+  Object.keys(oldProps).forEach((key) => {
+    if (!(key in newProps)) {
+      dom.removeAttribute(key);
+    }
+  });
+
+  const newChildren = newProps.children || [];
+  const oldChildren = oldProps.children || [];
+
+  const maxLength = Math.max(newChildren.length, oldChildren.length);
+  for (let i = 0; i < maxLength; i++) {
+    if (i >= newChildren.length) {
+      dom.removeChild(dom.childNodes[i]);
+    } else if (i >= oldChildren.length) {
+      dom.appendChild(createDom(newChildren[i]));
+    } else {
+      updateDom(dom.childNodes[i], oldChildren[i], newChildren[i]);
+    }
+  }
+}
