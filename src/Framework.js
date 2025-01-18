@@ -142,3 +142,19 @@ function updateDom(dom, oldVNode, newVNode) {
     }
   }
 }
+
+function diff(vNode, container, oldDom) {
+  const newDom = createDom(vNode);
+  if (oldDom) {
+    container.replaceChild(newDom, oldDom);
+  } else {
+    container.appendChild(newDom);
+  }
+  return newDom;
+}
+
+function renderWithVDOM(vNode, container) {
+  const oldDom = container.firstChild;
+  const newDom = diff(vNode, container, oldDom);
+  container.appendChild(newDom);
+}
