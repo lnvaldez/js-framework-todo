@@ -184,3 +184,13 @@ function createStore(reducer) {
 
   return { dispatch, subscribe, getState };
 }
+
+const Framework = {
+  createElement,
+  render: renderWithVDOM,
+  createStore,
+  jsx: createElement,
+  Component,
+};
+
+export default Framework;
