@@ -158,3 +158,29 @@ function renderWithVDOM(vNode, container) {
   const newDom = diff(vNode, container, oldDom);
   container.appendChild(newDom);
 }
+
+function createStore(reducer) {
+  let state = reducer(undefined, { type: "__INIT__" });
+  const listeners = [];
+
+  function dispatch(action) {
+    state = reducer(state, action);
+    listeners.forEach((listener) => listener());
+  }
+
+  function subscribe(listener) {
+    listeners.push(listener);
+    return () => {
+      const index = listeners.indexOf(listener);
+      if (index > -1) {
+        listeners.splice(index, 1);
+      }
+    };
+  }
+
+  function getState() {
+    return state;
+  }
+
+  return { dispatch, subscribe, getState };
+}
