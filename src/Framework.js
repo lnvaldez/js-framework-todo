@@ -8,7 +8,7 @@ class Component {
   setState(newState) {
     this.state = { ...this.state, ...newState };
     if (this._renderCallback) {
-      this._renderCallback;
+      this._renderCallback();
     }
   }
 
