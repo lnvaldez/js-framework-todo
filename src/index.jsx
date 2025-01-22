@@ -46,7 +46,7 @@ const store = Framework.createStore((state = { todos: [] }, action) => {
 
 function renderApp() {
   const root = document.getElementById("root");
-  Framework.render(Framework.jsx(TodoApp, { store }), root);
+  Framework.render(<TodoApp store={store} />, root);
 }
 
 store.subscribe(renderApp);
