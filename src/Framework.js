@@ -161,7 +161,6 @@ function diff(vNode, container, oldDom) {
   } else {
     container.appendChild(newDom);
   }
-  return newDom;
 }
 
 function renderWithVDOM(vNode, container) {
