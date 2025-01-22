@@ -1,45 +1,32 @@
 import Framework from "../Framework.js";
+import {
+  toggleTodo,
+  startEdit,
+  saveEdit,
+  removeTodo,
+} from "../actions/todoActions.js";
+import { styles } from "../styles/todoItem.js";
 
 class TodoItem extends Framework.Component {
   render() {
-    const { todo, index, store } = this.props;
+    const { todo = {}, index, store } = this.props;
+
+    if (!todo) return null;
 
     return (
-      <li
-        style={{
-          margin: "1rem 0",
-          padding: "1rem",
-          background: "var(--card-background-color)",
-          borderRadius: "var(--border-radius)",
-          boxShadow: "var(--card-box-shadow)",
-        }}
-      >
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr auto auto",
-            gap: "1rem",
-            alignItems: "center",
-          }}
-        >
+      <li style={styles.listItem}>
+        <div style={styles.container}>
           {todo.editing ? (
             <input
               type="text"
               value={todo.text}
-              onChange={(e) => {
-                store.dispatch({
-                  type: "SAVE_EDIT",
-                  payload: { index, text: e.target.value },
-                });
-              }}
+              onChange={(e) => store.dispatch(saveEdit(index, e.target.value))}
             />
           ) : (
             <span
-              onClick={() =>
-                store.dispatch({ type: "TOGGLE_TODO", payload: index })
-              }
+              onClick={() => store.dispatch(toggleTodo(index))}
               style={{
-                cursor: "pointer",
+                ...styles.todoText,
                 textDecoration: todo.completed ? "line-through" : "none",
                 opacity: todo.completed ? 0.7 : 1,
               }}
@@ -47,23 +34,17 @@ class TodoItem extends Framework.Component {
               {todo.text}
             </span>
           )}
-
           <button
-            onClick={() =>
-              store.dispatch({ type: "START_EDIT", payload: index })
-            }
+            onClick={() => store.dispatch(startEdit(index))}
             className="secondary outline"
-            style={{ margin: 0 }}
+            style={styles.button}
           >
             Edit
           </button>
-
           <button
-            onClick={() =>
-              store.dispatch({ type: "REMOVE_TODO", payload: index })
-            }
+            onClick={() => store.dispatch(removeTodo(index))}
             className="error outline"
-            style={{ margin: 0, "--background-color": "var(--del-color)" }}
+            style={styles.deleteButton}
           >
             Delete
           </button>
