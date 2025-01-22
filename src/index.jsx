@@ -1,5 +1,5 @@
 import Framework from "./Framework.js";
-import TodoApp from "./TodoApp.js";
+import TodoApp from "./components/TodoApp.js";
 import store from "./store.js";
 
 function renderApp() {
